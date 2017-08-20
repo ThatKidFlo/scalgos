@@ -1,0 +1,12 @@
+.settings
+.class
+.project
+**/*.classpath
+.idea/
+**/*.iml
+**/*.orig
+target/
+out/
+bin/
+**/WebContent/**
+.vscode/*
