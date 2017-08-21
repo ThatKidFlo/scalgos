@@ -16,13 +16,13 @@ class ExpressionGenerator private() {
     Future {
       findMatchingExpression(terms, Nil, result, promise)
     } flatMap {
-      case Nil => promise.future
-      case _ => promise.failure(new IllegalArgumentException(s"Cannot build a solution using $terms")).future
+      case Some(_) => promise.future
+      case None => promise.failure(new IllegalArgumentException(s"Cannot build a solution using $terms")).future
     }
   }
 
   @tailrec
-  private def findMatchingExpression(terms: List[Int], expressions: List[Expression], result: Int, promise: Promise[Expression]): List[Expression] = {
+  private def findMatchingExpression(terms: List[Int], expressions: List[Expression], result: Int, promise: Promise[Expression]): Option[Expression] = {
     val newExpressions: List[Expression] = generateExpressions(terms.head, expressions)
     val targetExpression: Option[Expression] = newExpressions.find(_.value == result)
 
@@ -30,9 +30,9 @@ class ExpressionGenerator private() {
       if (!promise.isCompleted) {
         promise.success(targetExpression.get)
       }
-      Nil
+      targetExpression
     } else {
-      if (terms.tail == Nil) expressions
+      if (terms.tail == Nil) Option.empty
       else findMatchingExpression(terms.tail, expressions ::: newExpressions, result, promise)
     }
   }
